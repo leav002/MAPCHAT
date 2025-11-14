@@ -1,0 +1,117 @@
+/* Basic Reset & Body */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F8FAFC; /* Light gray background from user */
+    color: #1E293B; /* Dark navy text from user */
+    line-height: 1.6;
+}
+
+/* Header Styling */
+header {
+    background-color: #ffffff; /* White header background */
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+header > div:first-child {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+header .logo-area {
+    display: flex;
+    align-items: center;
+}
+
+header .logo-area img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+header .logo-area h1 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #1E293B; /* Dark navy text from user */
+}
+
+header .auth-buttons a {
+    text-decoration: none;
+    color: #7DD3FC; /* Point color from user */
+    margin-left: 15px;
+    padding: 8px 15px;
+    border: 1px solid #7DD3FC; /* Point color from user */
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    font-weight: 600;
+}
+
+header .auth-buttons a:hover {
+    background-color: #8FB7F9; /* Hover color from user */
+    color: #ffffff;
+    border-color: #8FB7F9; /* Match border to hover background */
+}
+
+/* Navigation Styling */
+nav {
+    width: 100%;
+    max-width: 1200px;
+    background-color: #f8f9fa; /* Lighter gray for nav background */
+    border-top: 1px solid #e0e0e0;
+    padding: 5px 0;
+    border-radius: 5px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+nav ul li {
+    margin-right: 25px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #1E293B; /* Dark navy text from user */
+    font-weight: bold;
+    padding: 8px 0;
+    display: block;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #7DD3FC; /* Point color from user */
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 60vh;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #1E293B; /* Dark navy for footer background */
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    width: 100%;
+    margin-top: 30px;
+}

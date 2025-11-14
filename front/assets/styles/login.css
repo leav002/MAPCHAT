@@ -1,0 +1,108 @@
+/* Basic Reset & Body */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F8FAFC; /* Light gray background */
+    color: #1E293B; /* Dark navy text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Container for the login form */
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Logo and Title */
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-header img {
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.login-header h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #1E293B;
+}
+
+/* Form Styling */
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #7DD3FC; /* Point color */
+    box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.3);
+}
+
+/* Submit Button */
+.login-button {
+    background-color: #7DD3FC; /* Point color */
+    color: #ffffff;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background-color: #8FB7F9; /* Hover color */
+}
+
+/* Links below the form */
+.links {
+    margin-top: 25px;
+    font-size: 0.9em;
+}
+
+.links a {
+    color: #7DD3FC; /* Point color */
+    text-decoration: none;
+    margin: 0 10px;
+    transition: text-decoration 0.3s;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}

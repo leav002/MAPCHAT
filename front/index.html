@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPCHAT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+
+<body>
+    <header>
+        <div>
+            <div class="logo-area">
+                <a href="/">
+                    <img src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="MAPCHAT Logo" />
+                </a>
+                <h1>MAPCHAT</h1>
+            </div>
+            <div class="auth-buttons">
+                {% if user %}
+                <span class="user-info">{{ user.username }} / {{ user.nickname }}</span>
+                <a href="{{ url_for('logout') }}">로그아웃</a>
+                {% else %}
+                <a href="{{ url_for('sign_in') }}">로그인</a>
+                <a href="{{ url_for('sign_up') }}">회원가입</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="/map">지도</a></li>
+                <li><a href="/mychat">내 채팅</a></li>
+                <li><a href="/createchat">새 채팅방 만들기</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+    </main>
+    <footer>
+        &copy; 2024 MAPCHAT
+    </footer>
+</body>
+
+</html>
