@@ -1,6 +1,6 @@
-from db import db
+from .db import db
 from sqlalchemy.sql import func
-from sqlalchemy.dialects.mysql import POINT
+from geoalchemy2 import Geometry  # 1. 이 import로 변경
 
 # User 모델 정의
 class User(db.Model):
@@ -17,6 +17,7 @@ class User(db.Model):
     # 관계 설정
     created_chat_rooms = db.relationship('ChatRoom', backref='creator', lazy=True)
     messages = db.relationship('Message', backref='author', lazy=True)
+    chat_participations = db.relationship('ChatParticipant', backref='user', lazy=True)
 
 # ChatRoom 모델 정의
 class ChatRoom(db.Model):
@@ -25,8 +26,12 @@ class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     
-    # lat, lng 대신 location 사용
-    location = db.Column(POINT, nullable=False) # 2. 컬럼 변경
+    # 2. location 컬럼 변경 및 인덱스 추가
+    location = db.Column(
+        Geometry('POINT'), 
+        nullable=False, 
+        spatial_index=True  # 3. 공간 인덱스를 컬럼 정의에 포함
+    )
     
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, server_default=func.now())
@@ -35,10 +40,10 @@ class ChatRoom(db.Model):
     messages = db.relationship('Message', backref='room', lazy=True, cascade="all, delete-orphan")
     participants = db.relationship('ChatParticipant', backref='room', lazy=True, cascade="all, delete-orphan")
 
-    # SQLAlchemy에서 공간 인덱스 지정
-    __table_args__ = (
-        db.SpatialIndex('idx_location', location, mysql_using='BTREE'), # 3. 인덱스 추가
-    )
+    # 4. 기존 __table_args__ 제거 (SpatialIndex가 컬럼으로 이동했으므로)
+    # __table_args__ = (
+    #     db.SpatialIndex('idx_location', location, mysql_using='BTREE'),
+    # )
 
 # Message 모델 정의
 class Message(db.Model):
