@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAPCHAT - My Chats</title>
+    <title>MAPCHAT - Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
 <body>
@@ -31,35 +32,22 @@
 
         <nav>
             <ul>
-                <li><a href="{{ url_for('map_page') }}">지도</a></li>
-                <li><a href="{{ url_for('index') }}" style="font-weight: bold; color: #7DD3FC;">내 채팅</a></li>
+                <li><a href="{{ url_for('map_page') }}" style="font-weight: bold; color: #7DD3FC;">지도</a></li>
+                <li><a href="{{ url_for('index') }}">내 채팅</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <h2>My Chat Rooms</h2>
-        {% if user %}
-            {% if joined_rooms %}
-                <ul class="chat-room-list">
-                    {% for room in joined_rooms %}
-                        <li>
-                            <a href="{{ url_for('chat_room', room_id=room.id) }}">{{ room.name }}</a>
-                            <span>Created at: {{ room.created_at.strftime('%Y-%m-%d') }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>You haven't joined any chat rooms yet. Go to the <a href="{{ url_for('map_page') }}">Map</a> to find and join rooms!</p>
-            {% endif %}
-        {% else %}
-            <p>Please <a href="{{ url_for('sign_in') }}">log in</a> to see your chat rooms.</p>
-        {% endif %}
+        <div id="map"></div>
     </main>
     <footer>
         &copy; 2024 MAPCHAT
     </footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="{{ url_for('static', filename='assets/js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/map.js') }}"></script>
 </body>
 
 </html>
