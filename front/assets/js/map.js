@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mapContainer = document.getElementById('map');
         let map; // Will be initialized later
         let userMarker; // To store the user's location marker
+        let userAccuracyCircle; // To store the accuracy circle
 
         // Function to fetch and display chat rooms
         async function loadNearbyRooms(lat, lng) {
@@ -33,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Function to display a marker for the user's location
-        function displayUserMarker(lat, lng) {
+        // Function to display a marker and accuracy circle for the user's location
+        function displayUserMarker(lat, lng, accuracy) {
             const userPosition = new kakao.maps.LatLng(lat, lng);
 
             // If a user marker already exists, update its position
@@ -46,6 +47,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     position: userPosition,
                 });
                 userMarker.setMap(map);
+            }
+
+            // If an accuracy circle already exists, update its position and radius
+            if (userAccuracyCircle) {
+                userAccuracyCircle.setPosition(userPosition);
+                userAccuracyCircle.setRadius(accuracy);
+            } else {
+                // Create a new circle to show the accuracy
+                userAccuracyCircle = new kakao.maps.Circle({
+                    center: userPosition,
+                    radius: accuracy, // radius in meters
+                    strokeWeight: 1,
+                    strokeColor: '#007BFF',
+                    strokeOpacity: 0.8,
+                    fillColor: '#007BFF',
+                    fillOpacity: 0.15
+                });
+                userAccuracyCircle.setMap(map);
             }
 
             // Center the map on the user's location
@@ -106,9 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const { latitude, longitude } = position.coords;
+                    const { latitude, longitude, accuracy } = position.coords;
                     initMap(latitude, longitude);
-                    displayUserMarker(latitude, longitude);
+                    displayUserMarker(latitude, longitude, accuracy);
                     loadNearbyRooms(latitude, longitude);
                 },
                 (error) => {
