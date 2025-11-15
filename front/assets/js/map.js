@@ -118,7 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const defaultLng = 126.9780;
                     initMap(defaultLat, defaultLng);
                     loadNearbyRooms(defaultLat, defaultLng);
-                }
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Options for geolocation
             );
         } else {
             alert('Geolocation is not available in this browser. Showing default location (Seoul).');
