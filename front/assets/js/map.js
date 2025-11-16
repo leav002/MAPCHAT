@@ -52,12 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // If an accuracy circle already exists, update its position and radius
             if (userAccuracyCircle) {
                 userAccuracyCircle.setPosition(userPosition);
-                userAccuracyCircle.setRadius(accuracy);
+                userAccuracyCircle.setRadius(accuracy / 2);
             } else {
                 // Create a new circle to show the accuracy
                 userAccuracyCircle = new kakao.maps.Circle({
                     center: userPosition,
-                    radius: accuracy, // radius in meters
+                    radius: accuracy / 2, // radius in meters, reduced by half
                     strokeWeight: 1,
                     strokeColor: '#007BFF',
                     strokeOpacity: 0.8,
