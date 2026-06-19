@@ -1,63 +1,125 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Map JS Loaded");
+    if (typeof kakao === 'undefined') {
+        console.error("Kakao Maps API not loaded!");
+        return;
+    }
     kakao.maps.load(() => {
+        console.log("Kakao Maps Load Callback");
         const mapContainer = document.getElementById('map');
-        let map; // Will be initialized later
-        let userMarker; // To store the user's location marker
-        let userAccuracyCircle; // To store the accuracy circle
+        let map;
 
-        // Function to fetch and display chat rooms
+        let userMarker;
+        let userAccuracyCircle;
+        let creationInfoWindow;
+        let currentUserPosition;
+        let markers = []; // Track markers to prevent duplicates
+
+        // UI elements
+        const createRoomBtn = document.createElement('button');
+        createRoomBtn.id = 'floating-create-btn';
+        createRoomBtn.innerHTML = '+';
+        createRoomBtn.title = '현재 위치에 채팅방 생성';
+        document.body.appendChild(createRoomBtn);
+
+        createRoomBtn.addEventListener('click', () => {
+            if (!IS_LOGGED_IN) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+            if (!currentUserPosition) {
+                alert('사용자 위치를 확인하는 중입니다.');
+                return;
+            }
+            showCreationWindow(currentUserPosition);
+        });
+
         async function loadNearbyRooms(lat, lng) {
             const rooms = await fetchNearbyChatRooms(lat, lng);
+            
+            // Clear existing markers
+            markers.forEach(m => m.setMap(null));
+            markers = [];
+
             rooms.forEach(room => {
                 const roomPosition = new kakao.maps.LatLng(room.location.lat, room.location.lng);
-
-                // Create a marker for the chat room
-                const marker = new kakao.maps.Marker({
-                    position: roomPosition
-                });
+                const marker = new kakao.maps.Marker({ position: roomPosition });
                 marker.setMap(map);
+                markers.push(marker);
 
-                // Create an info window for the marker
                 const iwContent = `
-                    <div style="padding:5px; width: 150px; text-align: center;">
-                        <b>${room.name}</b><br>
-                        <button onclick="joinChat(${room.id})" style="margin-top: 5px; padding: 3px 7px; cursor: pointer;">Join</button>
+                    <div style="padding:10px; width: 180px; text-align: center; font-family: sans-serif;">
+                        <b style="font-size: 1.1em;">${room.name}</b><br>
+                        <span style="color: #666; font-size: 0.9em;">👥 참여자: ${room.participant_count}명</span><br>
+                        <button onclick="joinChat(${room.id})" style="margin-top: 8px; padding: 5px 12px; cursor: pointer; background: #007BFF; color: white; border: none; border-radius: 4px;">입장하기</button>
                     </div>`;
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: iwContent
-                });
+                const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
 
-                // Add click listener to open the info window
-                kakao.maps.event.addListener(marker, 'click', function () {
+                kakao.maps.event.addListener(marker, 'click', () => {
+                    if (creationInfoWindow) creationInfoWindow.close();
                     infowindow.open(map, marker);
                 });
             });
         }
 
-        // Function to display a marker and accuracy circle for the user's location
+        function showCreationWindow(position) {
+            if (creationInfoWindow) creationInfoWindow.close();
+
+            const formHtml = `
+                <div style="padding:15px; width: 220px; font-family: sans-serif;">
+                    <h4 style="margin: 0 0 10px 0;">새 채팅방 만들기</h4>
+                    <p style="font-size: 0.8em; color: #666; margin-bottom: 10px;">채팅방은 현재 내 위치에 생성됩니다.</p>
+                    <input type="text" id="chat-room-name" placeholder="방 제목 입력" required style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+                    <button id="create-room-btn-submit" style="width: 100%; padding: 8px 0; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px;">만들기</button>
+                </div>
+            `;
+
+            creationInfoWindow = new kakao.maps.InfoWindow({
+                content: formHtml,
+                position: position
+            });
+            creationInfoWindow.open(map);
+
+            setTimeout(() => {
+                const submitBtn = document.getElementById('create-room-btn-submit');
+                if (submitBtn) {
+                    submitBtn.onclick = async () => {
+                        const roomName = document.getElementById('chat-room-name').value.trim();
+                        if (roomName) {
+                            try {
+                                await createChatRoom(roomName, position.getLat(), position.getLng());
+                                creationInfoWindow.close();
+                                window.location.reload();
+                            } catch (error) {
+                                alert(`에러: ${error.message}`);
+                            }
+                        } else {
+                            alert('방 제목을 입력해주세요.');
+                        }
+                    };
+                }
+            }, 100);
+        }
+
         function displayUserMarker(lat, lng, accuracy) {
             const userPosition = new kakao.maps.LatLng(lat, lng);
+            currentUserPosition = userPosition;
 
-            // If a user marker already exists, update its position
             if (userMarker) {
                 userMarker.setPosition(userPosition);
             } else {
-                // Create a new marker for the user
-                userMarker = new kakao.maps.Marker({
-                    position: userPosition,
-                });
+                userMarker = new kakao.maps.Marker({ position: userPosition });
                 userMarker.setMap(map);
+                map.setCenter(userPosition);
             }
 
-            // If an accuracy circle already exists, update its position and radius
             if (userAccuracyCircle) {
                 userAccuracyCircle.setPosition(userPosition);
                 userAccuracyCircle.setRadius(accuracy / 2);
             } else {
-                // Create a new circle to show the accuracy
                 userAccuracyCircle = new kakao.maps.Circle({
                     center: userPosition,
-                    radius: accuracy / 2, // radius in meters, reduced by half
+                    radius: accuracy / 2,
                     strokeWeight: 1,
                     strokeColor: '#007BFF',
                     strokeOpacity: 0.8,
@@ -66,91 +128,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 userAccuracyCircle.setMap(map);
             }
-
-            // Center the map on the user's location
-            map.setCenter(userPosition);
         }
 
-        // Initialize the map
         function initMap(lat, lng) {
             const options = {
                 center: new kakao.maps.LatLng(lat, lng),
-                level: 4 // Zoom level
+                level: 3
             };
             map = new kakao.maps.Map(mapContainer, options);
 
-            // Add right-click event listener to the map
-            kakao.maps.event.addListener(map, 'rightclick', function (mouseEvent) {
-                const latlng = mouseEvent.latLng;
-
-                const formHtml = `
-                    <div style="padding:10px; width: 250px;">
-                        <h4>Create New Chat Room</h4>
-                        <input type="text" id="chat-room-name" placeholder="Enter room name" required style="width: 95%; margin-bottom: 5px;" />
-                        <button id="create-room-btn" style="width: 100%; padding: 5px 0; cursor: pointer;">Create</button>
-                    </div>
-                `;
-
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: formHtml,
-                    position: latlng
-                });
-                infowindow.open(map);
-
-                setTimeout(() => {
-                    const createBtn = document.getElementById('create-room-btn');
-                    if (createBtn) {
-                        createBtn.onclick = async () => {
-                            const roomNameInput = document.getElementById('chat-room-name');
-                            const roomName = roomNameInput.value;
-                            if (roomName) {
-                                try {
-                                    const newRoom = await createChatRoom(roomName, latlng.getLat(), latlng.getLng());
-                                    infowindow.close();
-                                    loadNearbyRooms(latlng.getLat(), latlng.getLng());
-                                } catch (error) {
-                                    alert(`Error: ${error.message}`);
-                                }
-                            } else {
-                                alert('Please enter a room name.');
-                            }
-                        };
-                    }
-                }, 100);
+            // Right click for desktop as fallback
+            kakao.maps.event.addListener(map, 'rightclick', (mouseEvent) => {
+                if (!IS_LOGGED_IN) { alert('로그인이 필요합니다.'); return; }
+                if (!currentUserPosition) { alert('위치를 확인 중입니다.'); return; }
+                showCreationWindow(currentUserPosition);
             });
         }
 
-        // --- Main Execution ---
-
+        // --- 실시간 위치 추적 (watchPosition) ---
         if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(
+            let firstLocation = true;
+            navigator.geolocation.watchPosition(
                 (position) => {
                     const { latitude, longitude, accuracy } = position.coords;
-                    initMap(latitude, longitude);
+                    if (firstLocation) {
+                        initMap(latitude, longitude);
+                        firstLocation = false;
+                    }
                     displayUserMarker(latitude, longitude, accuracy);
                     loadNearbyRooms(latitude, longitude);
                 },
                 (error) => {
-                    console.error("Error getting user's location:", error);
-                    alert('Could not determine your location. Showing default location (Seoul).');
-                    const defaultLat = 37.5665;
-                    const defaultLng = 126.9780;
-                    initMap(defaultLat, defaultLng);
-                    loadNearbyRooms(defaultLat, defaultLng);
+                    console.error("Location error:", error);
+                    if (firstLocation) {
+                        initMap(37.5665, 126.9780); // Seoul
+                        loadNearbyRooms(37.5665, 126.9780);
+                        firstLocation = false;
+                    }
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Options for geolocation
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
         } else {
-            alert('Geolocation is not available in this browser. Showing default location (Seoul).');
-            const defaultLat = 37.5665;
-            const defaultLng = 126.9780;
-            initMap(defaultLat, defaultLng);
-            loadNearbyRooms(defaultLat, defaultLng);
+            alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
+            initMap(37.5665, 126.9780);
         }
     });
 });
 
-// This function is called from the InfoWindow content
 function joinChat(roomId) {
     window.location.href = `/chat/${roomId}`;
 }

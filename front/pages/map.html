@@ -8,15 +8,21 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 
-<body>
+<body class="map-page-body">
     <header>
-        <div>
+        <div class="header-content">
             <div class="logo-area">
                 <a href="/">
                     <img src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="MAPCHAT Logo" />
+                    <h1>MAPCHAT</h1>
                 </a>
-                <h1>MAPCHAT</h1>
             </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('map_page') }}" style="font-weight: bold; color: #7DD3FC;">지도</a></li>
+                    <li><a href="{{ url_for('index') }}">내 채팅</a></li>
+                </ul>
+            </nav>
             <div class="auth-buttons">
                 {% if user %}
                 <span class="user-info">{{ user.username }} / {{ user.nickname }}</span>
@@ -27,22 +33,14 @@
                 {% endif %}
             </div>
         </div>
-
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('map_page') }}" style="font-weight: bold; color: #7DD3FC;">지도</a></li>
-                <li><a href="{{ url_for('index') }}">내 채팅</a></li>
-            </ul>
-        </nav>
     </header>
     <main>
         <div id="map"></div>
         <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=95b301c4a5bf851f8e5cbea4b8fb702c&libraries=services&autoload=false"></script>
     </main>
-    <footer>
-        &copy; 2024 MAPCHAT
-    </footer>
-
+    <script>
+        const IS_LOGGED_IN = {{ 'true' if user else 'false' }};
+    </script>
     <script src="{{ url_for('static', filename='assets/js/api.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/map.js') }}"></script>
 </body>
